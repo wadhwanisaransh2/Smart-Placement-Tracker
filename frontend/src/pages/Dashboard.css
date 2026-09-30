@@ -1,0 +1,469 @@
+.dashboard-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.dashboard-header {
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: var(--spacing-md);
+}
+
+.dashboard-header h1 {
+    font-size: 2.25rem;
+    margin-bottom: 0;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.dashboard-header p {
+    color: #64748b;
+    font-size: 1.125rem;
+    font-weight: 500;
+}
+
+/* Content Sections */
+.dashboard-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-card h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Stats Dashboard - Data Dense Style */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+    border-color: #3b82f6;
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.stat-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-content p {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Operational Console Bar - Sleek & Compact */
+.console-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.console-info h2 {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.console-info p {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.console-actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+/* Lists and Items */
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    background: #f8fafc;
+    border: 1px solid transparent;
+}
+
+.list-item:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.item-main h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.item-main p {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+/* Strategic Banner */
+.recommendation-banner {
+    background: white;
+    border: 2px solid #3b82f6;
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    display: flex;
+    gap: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.recommendation-banner::after {
+    content: 'RECOMMENDED';
+    position: absolute;
+    top: 20px;
+    right: -35px;
+    background: #3b82f6;
+    color: white;
+    padding: 4px 40px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    transform: rotate(45deg);
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .console-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ===== DARK MODE FIXES ===== */
+
+/* Dashboard Header */
+body.dark-mode .dashboard-header {
+    border-bottom-color: var(--border);
+}
+
+body.dark-mode .dashboard-header h1 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .dashboard-header p {
+    color: var(--text-secondary) !important;
+}
+
+/* Dashboard Cards */
+body.dark-mode .dashboard-card {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: var(--border);
+}
+
+body.dark-mode .dashboard-card h2,
+body.dark-mode .dashboard-card h3 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .dashboard-card p {
+    color: var(--text-secondary) !important;
+}
+
+/* Featured Opportunities */
+body.dark-mode .opportunity-item {
+    background: rgba(51, 65, 85, 0.5) !important;
+    border-color: var(--border);
+}
+
+body.dark-mode .opportunity-item h4 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .opportunity-item p,
+body.dark-mode .opportunity-item span {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .opportunity-meta {
+    color: var(--text-muted) !important;
+}
+
+/* List Items (Featured Opportunities & Recent Activity) */
+body.dark-mode .list-item {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 1px solid var(--border) !important;
+}
+
+body.dark-mode .list-item:hover {
+    background: rgba(71, 85, 105, 0.8) !important;
+    border-color: var(--primary) !important;
+}
+
+body.dark-mode .item-main h4 {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .item-main p {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .item-list .list-item {
+    background: rgba(51, 65, 85, 0.8) !important;
+}
+
+body.dark-mode .item-list .list-item .item-main h4 {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .item-list .list-item .item-main p {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .item-list .text-muted {
+    color: #94a3b8 !important;
+}
+
+/* Recent Activity */
+body.dark-mode .activity-item {
+    background: rgba(51, 65, 85, 0.5) !important;
+    border-color: var(--border);
+}
+
+body.dark-mode .activity-item h4 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .activity-item p,
+body.dark-mode .activity-item span {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .activity-time {
+    color: var(--text-muted) !important;
+}
+
+/* Company List Items */
+body.dark-mode .company-list-item {
+    background: rgba(51, 65, 85, 0.5) !important;
+    border-color: var(--border);
+}
+
+body.dark-mode .company-list-item h4,
+body.dark-mode .company-list-item strong {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .company-list-item p,
+body.dark-mode .company-list-item span:not(.badge) {
+    color: var(--text-secondary) !important;
+}
+
+/* Strategic Focus Card */
+body.dark-mode .strategic-focus-card {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: var(--border);
+}
+
+body.dark-mode .strategic-focus-card h3 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .strategic-focus-card p {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .strategic-focus-card .company-name {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .strategic-focus-card .metric-value {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .strategic-focus-card .metric-label {
+    color: var(--text-muted) !important;
+}
+
+/* Stats Grid */
+body.dark-mode .stats-grid .stat-card {
+    background: rgba(30, 41, 59, 0.95) !important;
+}
+
+body.dark-mode .stat-card-icon {
+    color: var(--primary) !important;
+}
+
+body.dark-mode .stat-card-value {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .stat-card-label {
+    color: var(--text-secondary) !important;
+}
+
+/* Quick Actions */
+body.dark-mode .quick-actions .action-card {
+    background: rgba(51, 65, 85, 0.5) !important;
+    border-color: var(--border);
+}
+
+body.dark-mode .action-card h4 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .action-card p {
+    color: var(--text-secondary) !important;
+}
+
+/* Summary Cards */
+body.dark-mode .summary-card {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: var(--border);
+}
+
+body.dark-mode .summary-card h3 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .summary-card p {
+    color: var(--text-secondary) !important;
+}
+
+/* Application Summary */
+body.dark-mode .application-summary {
+    background: rgba(30, 41, 59, 0.95) !important;
+}
+
+body.dark-mode .application-summary h3 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .summary-item {
+    background: rgba(51, 65, 85, 0.5) !important;
+}
+
+body.dark-mode .summary-item span {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .summary-item strong {
+    color: var(--text-primary) !important;
+}
+
+/* Profile Completion Alert */
+body.dark-mode .profile-alert {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: #ef4444;
+    color: #fca5a5 !important;
+}
+
+body.dark-mode .profile-alert a {
+    color: #60a5fa !important;
+}
+
+/* Empty States */
+body.dark-mode .empty-state {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .empty-state h3 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .empty-state p {
+    color: var(--text-muted) !important;
+}
+
+/* Loading State */
+body.dark-mode .loading {
+    color: var(--text-secondary) !important;
+}
+
+/* Badges in Dark Mode */
+body.dark-mode .badge {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Links in Dark Mode */
+body.dark-mode a:not(.btn) {
+    color: #60a5fa !important;
+}
+
+body.dark-mode a:not(.btn):hover {
+    color: #93c5fd !important;
+}

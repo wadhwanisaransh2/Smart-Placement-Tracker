@@ -1,0 +1,218 @@
+.students-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.students-header {
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.students-header h1 {
+    font-size: 2.25rem;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+/* Filters Section */
+.students-filters {
+    background: #ffffff;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    border: 1px solid #e2e8f0;
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    gap: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.students-filters .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0 1rem;
+    border-radius: var(--radius-md);
+    color: #64748b;
+}
+
+.students-filters .search-box input {
+    border: none;
+    background: transparent;
+    padding: 0.75rem 0;
+    color: #1e293b;
+    font-size: 0.95rem;
+    width: 100%;
+}
+
+.students-filters .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0 1rem;
+    border-radius: var(--radius-md);
+    color: #64748b;
+}
+
+.students-filters .filter-group select {
+    border: none;
+    background: transparent;
+    padding: 0.75rem 0;
+    color: #1e293b;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+/* Students Grid */
+.students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.student-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.student-card:hover {
+    border-color: #3b82f6;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.student-card .status-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom-left-radius: var(--radius-md);
+}
+
+.status-placed {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.status-seeking {
+    background: #fffbeb;
+    color: #f59e0b;
+}
+
+.student-main h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.student-email {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: var(--spacing-md);
+    display: block;
+}
+
+.student-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.meta-pill {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-full);
+}
+
+.pill-dept {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+.pill-cgpa {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.pill-roll {
+    background: #fdf2f8;
+    color: #db2777;
+}
+
+.placement-details {
+    padding: var(--spacing-md);
+    background: #f8fafc;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid #f1f5f9;
+}
+
+.placement-details p {
+    font-size: 0.8125rem;
+    margin-bottom: 2px;
+}
+
+.placement-details .company-name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.student-footer {
+    border-top: 1px solid #f1f5f9;
+    padding-top: var(--spacing-md);
+    margin-top: auto;
+}
+
+.btn-profile {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 0.625rem;
+    border-radius: var(--radius-md);
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-profile:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+@media (max-width: 640px) {
+    .students-filters {
+        flex-direction: column;
+    }
+}
