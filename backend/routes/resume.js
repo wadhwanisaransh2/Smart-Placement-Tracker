@@ -8,6 +8,10 @@ const { auth } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const { scoreResume } = require('../utils/resumeScorer');
 
+const RESUMES_DIR = process.env.VERCEL
+    ? path.join('/tmp', 'uploads', 'resumes')
+    : path.join(__dirname, '../uploads/resumes');
+
 // @route   POST /api/resume/upload
 // @desc    Upload resume
 // @access  Private (Student)
@@ -26,7 +30,7 @@ router.post('/upload', [auth, upload.single('resume')], async (req, res) => {
 
         // Delete old resume file if exists
         if (user.resume) {
-            const oldResumePath = path.join(__dirname, '../uploads/resumes', path.basename(user.resume));
+            const oldResumePath = path.join(RESUMES_DIR, path.basename(user.resume));
             if (fs.existsSync(oldResumePath)) {
                 fs.unlinkSync(oldResumePath);
             }
@@ -62,7 +66,7 @@ router.get('/download', auth, async (req, res) => {
             return res.status(404).json({ message: 'Resume not found' });
         }
 
-        const resumePath = path.join(__dirname, '../uploads/resumes', path.basename(user.resume));
+        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
 
         if (!fs.existsSync(resumePath)) {
             return res.status(404).json({ message: 'Resume file not found' });
@@ -91,7 +95,7 @@ router.get('/download/:userId', auth, async (req, res) => {
             return res.status(404).json({ message: 'Resume not found' });
         }
 
-        const resumePath = path.join(__dirname, '../uploads/resumes', path.basename(user.resume));
+        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
 
         if (!fs.existsSync(resumePath)) {
             return res.status(404).json({ message: 'Resume file not found' });
@@ -115,7 +119,7 @@ router.delete('/', auth, async (req, res) => {
         }
 
         // Delete file from filesystem
-        const resumePath = path.join(__dirname, '../uploads/resumes', path.basename(user.resume));
+        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
         if (fs.existsSync(resumePath)) {
             fs.unlinkSync(resumePath);
         }
@@ -141,7 +145,7 @@ router.get('/view', auth, async (req, res) => {
             return res.status(404).json({ message: 'Resume not found' });
         }
 
-        const resumePath = path.join(__dirname, '../uploads/resumes', path.basename(user.resume));
+        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
 
         if (!fs.existsSync(resumePath)) {
             return res.status(404).json({ message: 'Resume file not found' });
@@ -192,7 +196,7 @@ router.post('/score', auth, async (req, res) => {
 
         console.log('Company:', company.name, '| Job Role:', company.jobRole);
 
-        const resumePath = path.join(__dirname, '../uploads/resumes', path.basename(user.resume));
+        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
         console.log('Full resume path:', resumePath);
         console.log('File exists:', fs.existsSync(resumePath));
 

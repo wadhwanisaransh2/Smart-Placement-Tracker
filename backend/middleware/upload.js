@@ -3,9 +3,16 @@ const path = require('path');
 const fs = require('fs');
 
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '../uploads/resumes');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+const uploadsDir = process.env.VERCEL 
+    ? path.join('/tmp', 'uploads', 'resumes') 
+    : path.join(__dirname, '../uploads/resumes');
+
+try {
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+} catch (err) {
+    console.warn('Could not create uploads directory:', err.message);
 }
 
 // Configure storage

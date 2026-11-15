@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import {
     FiArrowLeft, FiMail, FiPhone, FiBook,
     FiCheckCircle, FiXCircle, FiClock, FiTrendingUp,
@@ -18,11 +18,7 @@ const StudentProfile = () => {
     const fetchStudentProfile = useCallback(async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('token');
-            const response = await axios.get(
-                `http://localhost:5000/api/students/${id}/profile`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const response = await api.get(`/students/${id}/profile`);
             setProfileData(response.data);
         } catch (error) {
             console.error('Error fetching student profile:', error);
@@ -259,7 +255,6 @@ const ApplicationsList = ({ applications, getStatusBadgeClass, getStatusIcon, on
     const handleUpdateStatus = async (appId) => {
         try {
             setUpdating(true);
-            const token = localStorage.getItem('token');
             const updateData = {
                 status: newStatus,
                 ...(newStatus === 'interview-scheduled' && interviewDate && { interviewDate }),
@@ -268,10 +263,9 @@ const ApplicationsList = ({ applications, getStatusBadgeClass, getStatusIcon, on
 
             console.log('Updating application:', appId, updateData);
 
-            const response = await axios.put(
-                `http://localhost:5000/api/applications/${appId}`,
-                updateData,
-                { headers: { Authorization: `Bearer ${token}` } }
+            const response = await api.put(
+                `/applications/${appId}`,
+                updateData
             );
 
             console.log('Update response:', response.data);

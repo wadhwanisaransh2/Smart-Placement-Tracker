@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { companyAPI, applicationAPI, resumeAPI } from '../services/api';
-import { FiArrowLeft, FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiUsers, FiCheckCircle, FiGlobe, FiEdit, FiFileText, FiAward } from 'react-icons/fi';
+import { FiArrowLeft, FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiUsers, FiCheckCircle, FiGlobe, FiEdit, FiAward } from 'react-icons/fi';
 import './CompanyDetails.css';
 
 const CompanyDetails = () => {
@@ -45,6 +45,7 @@ const CompanyDetails = () => {
         // Reset hasApplied when navigating to a different company
         setHasApplied(false);
         fetchCompanyDetails();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const fetchCompanyDetails = async () => {

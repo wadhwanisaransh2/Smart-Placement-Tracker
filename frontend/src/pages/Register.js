@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMail, FiLock, FiUser, FiBriefcase, FiUserCheck, FiPhone, FiBook, FiShield, FiBookOpen } from 'react-icons/fi';
+import { FiMail, FiLock, FiUser, FiBriefcase, FiPhone, FiBook, FiShield, FiBookOpen } from 'react-icons/fi';
 import './Login.css';
 
 const Register = () => {

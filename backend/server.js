@@ -11,7 +11,7 @@ connectDB();
 // Allowed origins: local dev + production Vercel URL
 const allowedOrigins = [
     'http://localhost:3000',
-    process.env.FRONTEND_URL,
+    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(u => u.trim().replace(/\/$/, '')) : [])
 ].filter(Boolean);
 
 // Middleware
@@ -19,15 +19,32 @@ app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (mobile apps, curl, Postman)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
+        if (
+            allowedOrigins.includes(origin) ||
+            allowedOrigins.includes(origin.replace(/\/$/, '')) ||
+            origin.endsWith('.vercel.app') ||
+            origin.includes('localhost') ||
+            process.env.NODE_ENV !== 'production'
+        ) {
             return callback(null, true);
         }
-        return callback(new Error('Not allowed by CORS'));
+        return callback(new Error('Not allowed by CORS: ' + origin));
     },
     credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Ensure DB is connected for serverless invocations
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('Database connection error in request handler:', err.message);
+        res.status(500).json({ message: 'Database connection error' });
+    }
+});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -39,7 +56,9 @@ app.use('/api/analytics', require('./routes/analytics')); // DSA-powered smart a
 app.use('/api/resume', require('./routes/resume')); // Resume upload/download
 
 // Serve uploaded files
-app.use('/uploads', express.static('uploads'));
+const path = require('path');
+const uploadsStaticDir = process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadsStaticDir));
 
 // Health check route
 app.get('/api/health', (req, res) => {
@@ -66,30 +85,34 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Get local IP address for network access
-const os = require('os');
-const getLocalIP = () => {
-    const interfaces = os.networkInterfaces();
-    for (const name of Object.keys(interfaces)) {
-        for (const iface of interfaces[name]) {
-            if (iface.family === 'IPv4' && !iface.internal) {
-                return iface.address;
+if (require.main === module) {
+    // Get local IP address for network access
+    const os = require('os');
+    const getLocalIP = () => {
+        const interfaces = os.networkInterfaces();
+        for (const name of Object.keys(interfaces)) {
+            for (const iface of interfaces[name]) {
+                if (iface.family === 'IPv4' && !iface.internal) {
+                    return iface.address;
+                }
             }
         }
-    }
-    return 'localhost';
-};
+        return 'localhost';
+    };
 
-const localIP = getLocalIP();
+    const localIP = getLocalIP();
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n========================================`);
-    console.log(`  PLACEMENT TRACKER API SERVER`);
-    console.log(`========================================`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`\nAccess URLs:`);
-    console.log(`  Local:   http://localhost:${PORT}`);
-    console.log(`  Network: http://${localIP}:${PORT}`);
-    console.log(`\nAPI Health: http://localhost:${PORT}/api/health`);
-    console.log(`========================================\n`);
-});
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`\n========================================`);
+        console.log(`  PLACEMENT TRACKER API SERVER`);
+        console.log(`========================================`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`\nAccess URLs:`);
+        console.log(`  Local:   http://localhost:${PORT}`);
+        console.log(`  Network: http://${localIP}:${PORT}`);
+        console.log(`\nAPI Health: http://localhost:${PORT}/api/health`);
+        console.log(`========================================\n`);
+    });
+}
+
+module.exports = app;

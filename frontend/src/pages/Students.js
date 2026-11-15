@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userAPI, resumeAPI } from '../services/api';
 import './Students.css';
-import { FiSearch, FiFilter, FiUser, FiMail, FiHash, FiAward, FiArrowRight, FiEye, FiDownload, FiFileText } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiUser, FiMail, FiHash, FiAward, FiDownload, FiFileText } from 'react-icons/fi';
 
 const Students = () => {
     const navigate = useNavigate();

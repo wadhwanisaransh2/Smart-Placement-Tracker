@@ -5,11 +5,12 @@ import { FiBriefcase, FiUsers, FiCheckCircle, FiTrendingUp, FiClock, FiZap, FiTa
 import './Dashboard.css';
 
 const Dashboard = () => {
-    const { user, isAdmin, isStudent, updateUser } = useAuth();
+    const { user, isAdmin, isStudent } = useAuth();
     const [stats, setStats] = useState(null);
     const [recentCompanies, setRecentCompanies] = useState([]);
     const [myApplications, setMyApplications] = useState([]);
     const [dailyRecommendation, setDailyRecommendation] = useState(null);
+    // eslint-disable-next-line no-unused-vars
     const [dashboardSummary, setDashboardSummary] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -320,7 +321,7 @@ const Dashboard = () => {
                                     <div key={app._id} className="list-item">
                                         <div className="item-main">
                                             <h4>{getAppCompanyName(app)}</h4>
-                                            <p>Applied {new Date(app.appliedDate).toLocaleDateString()}</p>
+                                            <p>{getAppRole(app)} • Applied {new Date(app.appliedDate).toLocaleDateString()}</p>
                                         </div>
                                         <span className={`badge ${getStatusBadge(app.status)}`}>
                                             {app.status?.replace('-', ' ')}

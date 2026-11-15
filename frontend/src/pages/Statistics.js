@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { userAPI } from '../services/api';
-import { FiUsers, FiCheckCircle, FiClock, FiTrendingUp, FiPieChart, FiBarChart2, FiAward, FiArrowUpRight } from 'react-icons/fi';
+import { FiUsers, FiCheckCircle, FiClock, FiTrendingUp, FiPieChart, FiBarChart2, FiAward } from 'react-icons/fi';
 import './Statistics.css';
 
 const Statistics = () => {

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { applicationAPI, analyticsAPI } from '../services/api';
-import { FiBriefcase, FiClock, FiPlus, FiCalendar, FiHash, FiEye } from 'react-icons/fi';
-import ApplicationTimeline from '../components/ApplicationTimeline';
+import { FiBriefcase, FiClock, FiPlus, FiCalendar, FiHash } from 'react-icons/fi';
 import './Dashboard.css';
 import './MyApplications.css';
 
@@ -60,8 +59,6 @@ const MyApplications = () => {
     const [sortBy, setSortBy] = useState('deadline');
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [showTimelineModal, setShowTimelineModal] = useState(false);
-    const [selectedApplication, setSelectedApplication] = useState(null);
     const [expandedId, setExpandedId] = useState(null);
     const [form, setForm] = useState({
         companyName: '',
