@@ -74,18 +74,27 @@ router.get('/stats', [auth, isAdmin], async (req, res) => {
             }
         ]);
 
-        // Package distribution
-        const packageStats = await User.aggregate([
-            { $match: { role: 'student', isPlaced: true } },
-            {
-                $group: {
-                    _id: null,
-                    avgPackage: { $avg: '$package' },
-                    minPackage: { $min: '$package' },
-                    maxPackage: { $max: '$package' }
-                }
-            }
-        ]);
+        // Package distribution - Calculate from Application model with company data
+        const Application = require('../models/Application');
+        const Company = require('../models/Company');
+
+        // Get all selected applications with company data
+        const selectedApplications = await Application.find({
+            status: 'selected'
+        }).populate('company', 'package');
+
+        // Extract packages from applications (company.package for placement_cell apps)
+        const packages = selectedApplications
+            .map(app => app.company?.package)
+            .filter(pkg => pkg != null && pkg > 0);
+
+        const packageStats = packages.length > 0 ? [{
+            _id: null,
+            avgPackage: packages.reduce((sum, pkg) => sum + pkg, 0) / packages.length,
+            minPackage: Math.min(...packages),
+            maxPackage: Math.max(...packages),
+            count: packages.length
+        }] : [];
 
         // Top companies
         const topCompanies = await User.aggregate([

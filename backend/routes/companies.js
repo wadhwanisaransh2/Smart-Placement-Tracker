@@ -7,7 +7,7 @@ const { auth, isAdmin } = require('../middleware/auth');
 const { sendNewCompanyEmail } = require('../utils/emailService');
 
 // @route   GET /api/companies
-// @desc    Get all companies
+// @desc    Get all companies with accurate application stats from Application model
 // @access  Private
 router.get('/', auth, async (req, res) => {
     try {
@@ -30,7 +30,30 @@ router.get('/', auth, async (req, res) => {
             .populate('createdBy', 'name email')
             .sort({ createdAt: -1 });
 
-        res.json({ companies });
+        // Calculate accurate stats from Application model
+        const Application = require('../models/Application');
+
+        const companiesWithStats = await Promise.all(companies.map(async (company) => {
+            const companyObj = company.toObject();
+
+            // Count applications and selections from Application model
+            const appliedCount = await Application.countDocuments({
+                company: company._id
+            });
+
+            const selectedCount = await Application.countDocuments({
+                company: company._id,
+                status: 'selected'
+            });
+
+            // Override the array lengths with actual counts from Application collection
+            companyObj.appliedStudents = { length: appliedCount };
+            companyObj.selectedStudents = { length: selectedCount };
+
+            return companyObj;
+        }));
+
+        res.json({ companies: companiesWithStats });
     } catch (error) {
         console.error('Get companies error:', error);
         res.status(500).json({ message: 'Server error' });

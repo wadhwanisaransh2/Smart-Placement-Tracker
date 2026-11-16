@@ -39,6 +39,11 @@ router.post('/upload', [auth, upload.single('resume')], async (req, res) => {
         // Save resume path to user
         const resumePath = `/uploads/resumes/${req.file.filename}`;
         user.resume = resumePath;
+        if (fs.existsSync(req.file.path)) {
+            user.resumeData = fs.readFileSync(req.file.path).toString('base64');
+            user.resumeContentType = req.file.mimetype || 'application/pdf';
+            user.resumeOriginalName = req.file.originalname;
+        }
         await user.save();
 
         res.json({
@@ -49,7 +54,7 @@ router.post('/upload', [auth, upload.single('resume')], async (req, res) => {
     } catch (error) {
         console.error('Resume upload error:', error);
         // Delete uploaded file on error
-        if (req.file) {
+        if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
         }
         res.status(500).json({ message: 'Server error during upload' });
@@ -62,17 +67,26 @@ router.post('/upload', [auth, upload.single('resume')], async (req, res) => {
 router.get('/download', auth, async (req, res) => {
     try {
         const user = await User.findById(req.userId);
-        if (!user || !user.resume) {
+        if (!user || (!user.resume && !user.resumeData)) {
             return res.status(404).json({ message: 'Resume not found' });
         }
 
-        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
+        const safeFilename = `${encodeURIComponent((user.name || 'Student').replace(/\s+/g, '_'))}_Resume.pdf`;
+        res.setHeader('Content-Type', user.resumeContentType || 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
 
-        if (!fs.existsSync(resumePath)) {
-            return res.status(404).json({ message: 'Resume file not found' });
+        const resumePath = user.resume ? path.join(RESUMES_DIR, path.basename(user.resume)) : null;
+
+        if (resumePath && fs.existsSync(resumePath)) {
+            return res.download(resumePath, `${user.name}_Resume.pdf`);
         }
 
-        res.download(resumePath, `${user.name}_Resume.pdf`);
+        if (user.resumeData) {
+            const buffer = Buffer.from(user.resumeData, 'base64');
+            return res.send(buffer);
+        }
+
+        res.status(404).json({ message: 'Resume file not found' });
     } catch (error) {
         console.error('Resume download error:', error);
         res.status(500).json({ message: 'Server error during download' });
@@ -80,28 +94,46 @@ router.get('/download', auth, async (req, res) => {
 });
 
 // @route   GET /api/resume/download/:userId
-// @desc    Download student resume (Admin only)
-// @access  Private (Admin)
+// @desc    Download student resume (Admin only or owner)
+// @access  Private
 router.get('/download/:userId', auth, async (req, res) => {
     try {
-        // Check if user is admin
         const requestingUser = await User.findById(req.userId);
-        if (requestingUser.role !== 'admin') {
+        console.log('Resume download request - User:', req.userId, 'Role:', requestingUser?.role, 'Target:', req.params.userId);
+
+        if (requestingUser.role !== 'admin' && req.userId !== req.params.userId) {
+            console.log('Access denied - Authorization check failed:', {
+                isAdmin: requestingUser.role === 'admin',
+                isOwner: req.userId === req.params.userId
+            });
             return res.status(403).json({ message: 'Access denied' });
         }
 
         const user = await User.findById(req.params.userId);
-        if (!user || !user.resume) {
-            return res.status(404).json({ message: 'Resume not found' });
+        console.log('Target user found:', !!user, 'Has resume:', !!user?.resume, 'Has resumeData:', !!user?.resumeData);
+
+        if (!user || (!user.resume && !user.resumeData)) {
+            return res.status(404).json({ message: 'Resume not found for this student' });
         }
 
-        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
+        const safeFilename = `${encodeURIComponent((user.name || 'Student').replace(/\s+/g, '_'))}_Resume.pdf`;
+        res.setHeader('Content-Type', user.resumeContentType || 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
 
-        if (!fs.existsSync(resumePath)) {
-            return res.status(404).json({ message: 'Resume file not found' });
+        const resumePath = user.resume ? path.join(RESUMES_DIR, path.basename(user.resume)) : null;
+
+        if (resumePath && fs.existsSync(resumePath)) {
+            console.log('Serving resume from file:', resumePath);
+            return res.download(resumePath, `${user.name}_Resume.pdf`);
         }
 
-        res.download(resumePath, `${user.name}_Resume.pdf`);
+        if (user.resumeData) {
+            console.log('Serving resume from base64 data');
+            const buffer = Buffer.from(user.resumeData, 'base64');
+            return res.send(buffer);
+        }
+
+        res.status(404).json({ message: 'Resume file not found' });
     } catch (error) {
         console.error('Resume download error:', error);
         res.status(500).json({ message: 'Server error during download' });

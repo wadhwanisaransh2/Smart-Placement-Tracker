@@ -49,6 +49,16 @@ const userSchema = new mongoose.Schema({
     resume: {
         type: String
     },
+    resumeData: {
+        type: String // Base64 encoded PDF for serverless persistence
+    },
+    resumeContentType: {
+        type: String,
+        default: 'application/pdf'
+    },
+    resumeOriginalName: {
+        type: String
+    },
     skills: [{
         type: String
     }],
