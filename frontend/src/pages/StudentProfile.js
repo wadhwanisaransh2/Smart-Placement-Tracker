@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { resumeAPI } from '../services/api';
 import {
     FiArrowLeft, FiMail, FiPhone, FiBook,
     FiCheckCircle, FiXCircle, FiClock, FiTrendingUp,
-    FiCalendar, FiBriefcase, FiEdit
+    FiCalendar, FiBriefcase, FiEdit, FiFileText,
+    FiDownload, FiEye, FiExternalLink, FiX
 } from 'react-icons/fi';
 import './StudentProfile.css';
 
@@ -14,6 +15,9 @@ const StudentProfile = () => {
     const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState(null);
     const [activeTab, setActiveTab] = useState('overview');
+    const [previewModalOpen, setPreviewModalOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [loadingResume, setLoadingResume] = useState(false);
 
     const fetchStudentProfile = useCallback(async () => {
         try {
@@ -31,6 +35,49 @@ const StudentProfile = () => {
     useEffect(() => {
         fetchStudentProfile();
     }, [fetchStudentProfile]);
+
+    const handleDownloadResume = async () => {
+        if (!profileData?.student) return;
+        try {
+            const response = await resumeAPI.downloadStudent(id);
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${(profileData.student.name || 'Student').replace(/\s+/g, '_')}_Resume.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        } catch (error) {
+            console.error('Resume download error:', error);
+            alert('Resume file could not be downloaded for this student');
+        }
+    };
+
+    const handleViewResume = async () => {
+        try {
+            setLoadingResume(true);
+            const response = await resumeAPI.viewStudent(id);
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            setPreviewUrl(url);
+            setPreviewModalOpen(true);
+        } catch (error) {
+            console.error('Resume view error:', error);
+            alert('Resume file could not be previewed for this student');
+        } finally {
+            setLoadingResume(false);
+        }
+    };
+
+    const handleClosePreview = () => {
+        setPreviewModalOpen(false);
+        if (previewUrl) {
+            window.URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
+        }
+    };
 
     const getStatusBadgeClass = (status) => {
         const statusMap = {
@@ -104,6 +151,25 @@ const StudentProfile = () => {
                                 <span className="badge badge-warning">Not Placed</span>
                             )}
                         </div>
+                        {student.resume && (
+                            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                <button
+                                    className="btn btn-primary btn-sm"
+                                    onClick={handleViewResume}
+                                    disabled={loadingResume}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                    <FiEye /> {loadingResume ? 'Loading...' : 'Preview Resume'}
+                                </button>
+                                <button
+                                    className="btn btn-outline btn-sm"
+                                    onClick={handleDownloadResume}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                    <FiDownload /> Download Resume
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -241,6 +307,57 @@ const StudentProfile = () => {
                     )}
                 </div>
             </div>
+            {/* Resume Preview Modal for Admin */}
+            {previewModalOpen && previewUrl && (
+                <div className="modal-overlay" onClick={handleClosePreview}>
+                    <div
+                        className="modal-content resume-preview-modal"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ maxWidth: '900px', width: '95%', height: '88vh', display: 'flex', flexDirection: 'column' }}
+                    >
+                        <div className="modal-header">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <FiFileText style={{ color: 'var(--primary)', fontSize: '1.4rem' }} />
+                                <div>
+                                    <h2 style={{ fontSize: '1.25rem', margin: 0 }}>{student.name}'s Resume</h2>
+                                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Student Resume Document</span>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <button
+                                    className="btn btn-outline btn-sm"
+                                    onClick={handleDownloadResume}
+                                    title="Download PDF"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                    <FiDownload /> Download
+                                </button>
+                                <a
+                                    href={previewUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="btn btn-primary btn-sm"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                    <FiExternalLink /> Open in Tab
+                                </a>
+                                <button className="close-btn" onClick={handleClosePreview} title="Close">
+                                    <FiX />
+                                </button>
+                            </div>
+                        </div>
+                        <div style={{ flex: 1, position: 'relative', background: '#0f172a', borderRadius: '12px', overflow: 'hidden', minHeight: '400px' }}>
+                            <iframe
+                                src={`${previewUrl}#toolbar=1`}
+                                title="Student Resume Preview"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 'none', width: '100%', height: '100%', display: 'block' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -17,3 +17,4 @@ coverage/
 *.md
 !README.md
 launch-chrome-debug.bat
+backend/uploads/resumes/*.pdf

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userAPI, applicationAPI, resumeAPI } from '../services/api';
-import { FiUser, FiMail, FiPhone, FiBook, FiBriefcase, FiEdit2, FiCalendar, FiCheckCircle, FiClock, FiXCircle, FiFileText, FiUpload, FiDownload, FiTrash2, FiEye } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiBook, FiBriefcase, FiEdit2, FiCalendar, FiCheckCircle, FiClock, FiXCircle, FiFileText, FiUpload, FiDownload, FiTrash2, FiEye, FiExternalLink, FiX } from 'react-icons/fi';
 import './Profile.css';
 
 const Profile = () => {
@@ -9,6 +9,9 @@ const Profile = () => {
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [uploadingResume, setUploadingResume] = useState(false);
+    const [viewingResume, setViewingResume] = useState(false);
+    const [previewModalOpen, setPreviewModalOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
     const [stats, setStats] = useState({
         total: 0,
         pending: 0,
@@ -164,8 +167,8 @@ const Profile = () => {
         if (!file) return;
 
         // Validate file type
-        if (file.type !== 'application/pdf') {
-            alert('Please upload a PDF file');
+        if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+            alert('Please upload a valid PDF file');
             return;
         }
 
@@ -177,47 +180,64 @@ const Profile = () => {
 
         try {
             setUploadingResume(true);
-            const formData = new FormData();
-            formData.append('resume', file);
+            const formDataUpload = new FormData();
+            formDataUpload.append('resume', file);
 
-            const response = await resumeAPI.upload(formData);
+            const response = await resumeAPI.upload(formDataUpload);
 
             // Update user context with new resume path
             updateUser({ ...user, resume: response.data.resume });
 
-            alert('Resume uploaded successfully!');
+            alert('Resume uploaded successfully! You can now view, download, or score it.');
         } catch (error) {
             console.error('Resume upload error:', error);
             alert(error.response?.data?.message || 'Failed to upload resume');
         } finally {
             setUploadingResume(false);
+            e.target.value = '';
         }
     };
 
     const handleResumeDownload = async () => {
         try {
             const response = await resumeAPI.download();
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `${user.name}_Resume.pdf`);
+            const filename = `${(user.name || 'Student').replace(/\s+/g, '_')}_Resume.pdf`;
+            link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
             link.remove();
+            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
         } catch (error) {
             console.error('Resume download error:', error);
-            alert('Failed to download resume');
+            alert('Failed to download resume. The file may be missing, please re-upload.');
         }
     };
 
     const handleResumeView = async () => {
         try {
+            setViewingResume(true);
             const response = await resumeAPI.view();
-            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-            window.open(url, '_blank');
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            setPreviewUrl(url);
+            setPreviewModalOpen(true);
         } catch (error) {
             console.error('Resume view error:', error);
-            alert('Failed to view resume');
+            alert('Failed to preview resume. The file may be missing, please re-upload.');
+        } finally {
+            setViewingResume(false);
+        }
+    };
+
+    const handleClosePreview = () => {
+        setPreviewModalOpen(false);
+        if (previewUrl) {
+            window.URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
         }
     };
 
@@ -229,6 +249,7 @@ const Profile = () => {
         try {
             await resumeAPI.delete();
             updateUser({ ...user, resume: null });
+            handleClosePreview();
             alert('Resume deleted successfully');
         } catch (error) {
             console.error('Resume delete error:', error);
@@ -282,69 +303,45 @@ const Profile = () => {
 
             {/* Resume Section for Students */}
             {user?.role === 'student' && !editing && (
-                <div className="resume-section fade-in" style={{
-                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))',
-                    border: '2px solid rgba(102, 126, 234, 0.3)',
-                    borderRadius: '16px',
-                    padding: '1.5rem',
-                    marginBottom: '2rem'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                        <h3 style={{ margin: 0, color: '#2d3748', fontSize: '1.25rem', fontWeight: '700' }}>
-                            <FiFileText style={{ marginRight: '0.5rem' }} />
-                            Resume
-                        </h3>
+                <div className="resume-section fade-in">
+                    <div className="resume-section-header">
+                        <div className="resume-header-left">
+                            <div className="resume-icon-badge">
+                                <FiFileText />
+                            </div>
+                            <div>
+                                <h3 className="resume-title">My Placement Resume</h3>
+                                <p className="resume-subtitle">
+                                    {user.resume ? 'Your active PDF resume attached to job applications' : 'Upload your resume in PDF format (Max 5MB)'}
+                                </p>
+                            </div>
+                        </div>
                         {user.resume && (
-                            <span style={{
-                                background: 'linear-gradient(135deg, #10b981, #059669)',
-                                color: 'white',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '12px',
-                                fontSize: '0.85rem',
-                                fontWeight: '600'
-                            }}>
-                                <FiCheckCircle style={{ marginRight: '0.25rem' }} />
-                                Uploaded
+                            <span className="badge badge-success">
+                                <FiCheckCircle /> Active Resume
                             </span>
                         )}
                     </div>
 
                     {user.resume ? (
-                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        <div className="resume-actions-row">
                             <button
                                 onClick={handleResumeView}
                                 className="btn btn-primary"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                                    border: 'none'
-                                }}
+                                disabled={viewingResume}
                             >
-                                <FiEye /> View Resume
+                                <FiEye /> {viewingResume ? 'Loading Preview...' : 'View Resume'}
                             </button>
                             <button
                                 onClick={handleResumeDownload}
-                                className="btn btn-outline"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem'
-                                }}
+                                className="btn btn-secondary"
                             >
-                                <FiDownload /> Download
+                                <FiDownload /> Download PDF
                             </button>
                             <label
                                 htmlFor="resume-upload"
                                 className="btn btn-outline"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    cursor: 'pointer',
-                                    margin: 0
-                                }}
+                                style={{ cursor: 'pointer', margin: 0 }}
                             >
                                 <FiUpload /> {uploadingResume ? 'Uploading...' : 'Replace'}
                                 <input
@@ -358,36 +355,20 @@ const Profile = () => {
                             </label>
                             <button
                                 onClick={handleResumeDelete}
-                                className="btn btn-outline"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    color: '#ef4444',
-                                    borderColor: '#ef4444'
-                                }}
+                                className="btn btn-danger-outline"
                             >
                                 <FiTrash2 /> Delete
                             </button>
                         </div>
                     ) : (
-                        <div>
-                            <p style={{ color: '#718096', marginBottom: '1rem', fontSize: '0.95rem' }}>
-                                Upload your resume to apply for companies. Only PDF files are accepted (Max 5MB).
-                            </p>
+                        <div className="resume-empty-box">
+                            <p>Upload your resume to apply for campus drives and use our AI Resume Scorer.</p>
                             <label
                                 htmlFor="resume-upload"
                                 className="btn btn-primary"
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    cursor: 'pointer',
-                                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                                    border: 'none'
-                                }}
+                                style={{ cursor: 'pointer', display: 'inline-flex', marginTop: '0.5rem' }}
                             >
-                                <FiUpload /> {uploadingResume ? 'Uploading...' : 'Upload Resume'}
+                                <FiUpload /> {uploadingResume ? 'Uploading...' : 'Upload PDF Resume'}
                                 <input
                                     id="resume-upload"
                                     type="file"
@@ -661,6 +642,58 @@ const Profile = () => {
                     )}
                 </div>
             </div>
+
+            {/* Resume Preview Modal */}
+            {previewModalOpen && previewUrl && (
+                <div className="modal-overlay" onClick={handleClosePreview}>
+                    <div
+                        className="modal-content resume-preview-modal"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ maxWidth: '900px', width: '95%', height: '88vh', display: 'flex', flexDirection: 'column' }}
+                    >
+                        <div className="modal-header">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <FiFileText style={{ color: 'var(--primary)', fontSize: '1.4rem' }} />
+                                <div>
+                                    <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Resume Preview</h2>
+                                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{user?.name} · PDF Document</span>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <button
+                                    className="btn btn-outline btn-sm"
+                                    onClick={handleResumeDownload}
+                                    title="Download PDF"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                    <FiDownload /> Download
+                                </button>
+                                <a
+                                    href={previewUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="btn btn-primary btn-sm"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                    <FiExternalLink /> New Tab
+                                </a>
+                                <button className="close-btn" onClick={handleClosePreview} title="Close">
+                                    <FiX />
+                                </button>
+                            </div>
+                        </div>
+                        <div style={{ flex: 1, position: 'relative', background: '#0f172a', borderRadius: '12px', overflow: 'hidden', minHeight: '400px' }}>
+                            <iframe
+                                src={`${previewUrl}#toolbar=1`}
+                                title="Resume PDF Preview"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 'none', width: '100%', height: '100%', display: 'block' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

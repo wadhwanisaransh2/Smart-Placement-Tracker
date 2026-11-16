@@ -55,17 +55,49 @@ const Companies = () => {
         }
     };
 
+    const getCompanyPkg = (company) => {
+        if (company.package !== undefined && company.package !== null && !isNaN(Number(company.package))) {
+            return Number(company.package);
+        }
+        if (company.jobOpenings && company.jobOpenings.length > 0) {
+            const pkgs = company.jobOpenings
+                .map(j => Number(j.package))
+                .filter(p => !isNaN(p) && p > 0);
+            if (pkgs.length > 0) return Math.max(...pkgs);
+        }
+        return 0;
+    };
+
+    const getCompanyDeadline = (company) => {
+        if (company.jobOpenings && company.jobOpenings.length > 0 && company.jobOpenings[0].applicationDeadline) {
+            return company.jobOpenings[0].applicationDeadline;
+        }
+        return company.applicationDeadline || null;
+    };
+
+    const getCompanyRole = (company) => {
+        if (company.jobOpenings && company.jobOpenings.length > 0) {
+            const roles = company.jobOpenings.map(j => j.role).filter(Boolean);
+            if (roles.length > 0) return roles.join(', ');
+        }
+        return company.jobRole || 'Multiple Positions';
+    };
+
     const filterCompanies = useCallback(() => {
         let filtered = companies;
 
         // Search filter
         if (searchTerm) {
-            filtered = filtered.filter(company =>
-                company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                company.jobRole.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                company.industry?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                company.location?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            filtered = filtered.filter(company => {
+                const roleText = getCompanyRole(company).toLowerCase();
+                const term = searchTerm.toLowerCase();
+                return (
+                    company.name?.toLowerCase().includes(term) ||
+                    roleText.includes(term) ||
+                    company.industry?.toLowerCase().includes(term) ||
+                    company.location?.toLowerCase().includes(term)
+                );
+            });
         }
 
         // Status filter
@@ -76,7 +108,7 @@ const Companies = () => {
         // Package filter
         if (packageFilter !== 'all') {
             filtered = filtered.filter(company => {
-                const pkg = company.package;
+                const pkg = getCompanyPkg(company);
                 switch (packageFilter) {
                     case '0-5': return pkg >= 0 && pkg <= 5;
                     case '5-10': return pkg > 5 && pkg <= 10;
@@ -96,17 +128,22 @@ const Companies = () => {
 
         // Sorting
         filtered = [...filtered].sort((a, b) => {
+            const pkgA = getCompanyPkg(a);
+            const pkgB = getCompanyPkg(b);
+            const deadA = getCompanyDeadline(a) ? new Date(getCompanyDeadline(a)).getTime() : Infinity;
+            const deadB = getCompanyDeadline(b) ? new Date(getCompanyDeadline(b)).getTime() : Infinity;
+
             switch (sortBy) {
                 case 'deadline':
-                    return new Date(a.applicationDeadline) - new Date(b.applicationDeadline);
+                    return deadA - deadB;
                 case 'package-high':
-                    return b.package - a.package;
+                    return pkgB - pkgA;
                 case 'package-low':
-                    return a.package - b.package;
+                    return pkgA - pkgB;
                 case 'name':
-                    return a.name.localeCompare(b.name);
+                    return (a.name || '').localeCompare(b.name || '');
                 case 'newest':
-                    return new Date(b.createdAt) - new Date(a.createdAt);
+                    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
                 default:
                     return 0;
             }
@@ -448,7 +485,7 @@ const Companies = () => {
                             </div>
 
                             <p className="company-role">
-                                <FiBriefcase /> {company.jobRole}
+                                <FiBriefcase /> {getCompanyRole(company)}
                             </p>
 
                             <div className="company-details">
@@ -460,11 +497,13 @@ const Companies = () => {
                                 )}
                                 <div className="detail-item">
                                     <FiDollarSign />
-                                    <span>₹{company.package} LPA</span>
+                                    <span>₹{getCompanyPkg(company)} LPA</span>
                                 </div>
                                 <div className="detail-item">
                                     <FiCalendar />
-                                    <span>Deadline: {new Date(company.applicationDeadline).toLocaleDateString()}</span>
+                                    <span>
+                                        Deadline: {getCompanyDeadline(company) ? new Date(getCompanyDeadline(company)).toLocaleDateString() : 'N/A'}
+                                    </span>
                                 </div>
                             </div>
 

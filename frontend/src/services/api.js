@@ -105,6 +105,14 @@ export const resumeAPI = {
             responseType: 'blob'
         });
     },
+    viewStudent: (userId) => {
+        return axios.get(`${API_URL}/resume/view/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            responseType: 'blob'
+        });
+    },
     score: (companyId) => api.post('/resume/score', { companyId })
 };
 

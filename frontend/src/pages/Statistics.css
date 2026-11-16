@@ -1,82 +1,90 @@
 .statistics-container {
-    max-width: 1300px;
+    max-width: 1360px;
     margin: 0 auto;
-    padding: var(--spacing-xl) var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-2xl);
 }
 
 .statistics-header {
     margin-bottom: var(--spacing-xl);
-    text-align: left;
-    /* Align left for more professional feel */
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
 }
 
 .statistics-header h1 {
     font-size: 2.25rem;
-    margin-bottom: var(--spacing-xs);
-    color: #0f172a;
+    color: var(--text-primary);
     font-weight: 800;
     letter-spacing: -0.03em;
+    margin: 0 0 0.25rem 0;
 }
 
 .statistics-header p {
-    color: #64748b;
-    font-size: 1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
 }
 
 .analytics-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
 }
 
 .analytics-card {
-    background: white;
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--radius-xl);
     box-shadow: var(--shadow-sm);
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: var(--spacing-lg);
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
 }
 
 .analytics-card:hover {
-    border-color: #3b82f6;
+    border-color: var(--primary-light);
     box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .analytics-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     flex-shrink: 0;
-    color: white;
+    color: #ffffff;
 }
 
+.analytics-icon.blue { background: var(--gradient-primary); }
+.analytics-icon.green { background: var(--gradient-success); }
+.analytics-icon.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.analytics-icon.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
 .analytics-info h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0f172a;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--text-primary);
     margin: 0;
     line-height: 1;
+    letter-spacing: -0.02em;
 }
 
 .analytics-info p {
-    color: #64748b;
-    font-size: 0.75rem;
-    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    margin: 0.25rem 0 0 0;
 }
 
-/* Visualization Cards */
-/* Visualization Layout - Compact */
+/* Visualization Layout */
 .viz-grid {
     display: grid;
     grid-template-columns: 1.6fr 1fr;
@@ -85,160 +93,28 @@
 }
 
 .viz-card {
-    background: white;
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
     box-shadow: var(--shadow-sm);
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
 }
 
 .viz-card h2 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-primary);
     margin-bottom: var(--spacing-lg);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-/* Progress Bars for Depts */
-/* Dept Stats Enhancement - Dense */
-.dept-stat-item {
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid #f1f5f9;
+.viz-card h2 svg {
+    color: var(--primary);
 }
 
-.dept-stat-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.dept-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.dept-name {
-    font-weight: 600;
-    color: #334155;
-}
-
-.dept-count {
-    font-size: 0.875rem;
-    color: #64748b;
-}
-
-.progress-bar-container {
-    height: 8px;
-    background: #f1f5f9;
-    border-radius: var(--radius-full);
-    overflow: hidden;
-    margin: var(--spacing-sm) 0;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    border-radius: 5px;
-    transition: width 1s ease-out;
-}
-
-.dept-meta {
-    display: flex;
-    gap: 1.5rem;
-    font-size: 0.8125rem;
-    color: #64748b;
-}
-
-.dept-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-/* Top Companies */
-/* Compensation Cards - Professional Lists */
-.package-stat-item {
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: #ffffff;
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-md);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-
-.package-stat-item:hover {
-    border-color: #3b82f6;
-    background: #f8fafc;
-    transform: translateX(4px);
-}
-
-.package-stat-item .label {
-    font-weight: 600;
-    color: #475569;
-    font-size: 0.95rem;
-}
-
-.package-stat-item .value {
-    font-weight: 800;
-    font-size: 1.1rem;
-    letter-spacing: -0.01em;
-}
-
-.top-company-pill {
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: #ffffff;
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-sm);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-
-.top-company-pill:hover {
-    border-color: #3b82f6;
-    background: #f8fafc;
-    transform: translateX(4px);
-}
-
-.company-rank {
-    width: 28px;
-    height: 28px;
-    background: #e2e8f0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #475569;
-}
-
-.top-company-pill:nth-child(1) .company-rank {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.top-company-pill:nth-child(2) .company-rank {
-    background: #f1f5f9;
-    color: #475569;
-}
-
-.top-company-pill:nth-child(3) .company-rank {
-    background: #ffedd5;
-    color: #9a3412;
-}
-
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
     .analytics-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -248,12 +124,8 @@
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 600px) {
     .analytics-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .viz-grid {
         grid-template-columns: 1fr;
     }
 }

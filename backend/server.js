@@ -30,7 +30,8 @@ app.use(cors({
         }
         return callback(new Error('Not allowed by CORS: ' + origin));
     },
-    credentials: true
+    credentials: true,
+    exposedHeaders: ['Content-Disposition']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -57,7 +58,16 @@ app.use('/api/resume', require('./routes/resume')); // Resume upload/download
 
 // Serve uploaded files
 const path = require('path');
+const fs = require('fs');
 const uploadsStaticDir = process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+const resumesDir = path.join(uploadsStaticDir, 'resumes');
+if (!fs.existsSync(resumesDir)) {
+    try {
+        fs.mkdirSync(resumesDir, { recursive: true });
+    } catch (e) {
+        console.warn('Could not create resumes directory:', e.message);
+    }
+}
 app.use('/uploads', express.static(uploadsStaticDir));
 
 // Health check route

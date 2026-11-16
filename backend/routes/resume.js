@@ -148,14 +148,44 @@ router.get('/view', auth, async (req, res) => {
         const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
 
         if (!fs.existsSync(resumePath)) {
-            return res.status(404).json({ message: 'Resume file not found' });
+            return res.status(404).json({ message: 'Resume file not found on server' });
         }
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline');
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(user.name)}_Resume.pdf"`);
         res.sendFile(resumePath);
     } catch (error) {
         console.error('Resume view error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// @route   GET /api/resume/view/:userId
+// @desc    View student resume (Admin or owner)
+// @access  Private
+router.get('/view/:userId', auth, async (req, res) => {
+    try {
+        const requestingUser = await User.findById(req.userId);
+        if (requestingUser.role !== 'admin' && req.userId !== req.params.userId) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
+        const user = await User.findById(req.params.userId);
+        if (!user || !user.resume) {
+            return res.status(404).json({ message: 'Resume not found' });
+        }
+
+        const resumePath = path.join(RESUMES_DIR, path.basename(user.resume));
+
+        if (!fs.existsSync(resumePath)) {
+            return res.status(404).json({ message: 'Resume file not found on server' });
+        }
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(user.name)}_Resume.pdf"`);
+        res.sendFile(resumePath);
+    } catch (error) {
+        console.error('Resume view student error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
